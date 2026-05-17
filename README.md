@@ -24,7 +24,7 @@ Three components work together:
 | `launcher.py` | Outside your repo | Restarts server.py after every update |
 | `gitdeploy.service` | `/etc/systemd/system/` | Runs everything on boot |
 
-The trick is that `launcher.py` lives **outside** your repo so it never gets overwritten by `git pull`. It watches `server.py` and restarts it whenever it exits — which `server.py` does automatically after pulling new code from GitHub.
+The trick is that `launcher.py` lives **outside** your repo so it never gets overwritten by `git pull`. It watches `server.py` and restarts it whenever it exits — which `server.py` does automatically after a successful git pull.
 
 ---
 
@@ -96,6 +96,34 @@ cp server.py /var/www/YOUR_REPO/
 cd /var/www/YOUR_REPO
 git add server.py
 git commit -m "add auto-deploy server"
+git push
+```
+
+### 5.1. Update the Repository Directory in `server.py`
+
+Now you need to configure `server.py` with your repository's directory. Edit the file you just copied:
+
+```bash
+nano /var/www/YOUR_REPO/server.py
+```
+
+Find this line near the top:
+
+```python
+REPO_DIR = os.path.dirname(os.path.abspath(__file__))
+```
+
+If you want to use the default behavior (serves from the repo root), you can leave it as is. However, if you need to customize it, change it to your repo's directory:
+
+```python
+REPO_DIR = "/var/www/YOUR_REPO"
+```
+
+Save with `Ctrl+X`, `Y`, `Enter`. Then commit and push this change:
+
+```bash
+git add server.py
+git commit -m "configure repo directory"
 git push
 ```
 
